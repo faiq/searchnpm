@@ -1,0 +1,22 @@
+{
+  "name": "searchnpm",
+  "version": "0.0.0",
+  "description": "A module that makes queries to npm, allows you to search by certain things ",
+  "main": "index.js",
+  "scripts": {
+    "test": "lab -vc tests/*.js"
+  },
+  "keywords": [
+    "npm",
+    "search",
+    "index"
+  ],
+  "author": "Faiq",
+  "license": "ISC",
+  "dependencies": {
+    "elasticsearch": "^2.2.0"
+  },
+  "devDependencies": {
+    "lab": "^3.2.1"
+  }
+}
