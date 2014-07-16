@@ -14,14 +14,14 @@ function Searchnpm (esUrl){
   })
   this.client.ping({ 
     requestTimeout: 1000, 
-    hello: "elasticsearch!"
+    hello: 'elasticsearch!'
   }, function (error) { 
     if (error) throw Error('Elasticsearch is having trouble connecting the url you gave it') 
     else console.log('connected to ES')   
   })
-  this["validObj"] = {'searchBy': 'field', 'searchQuery': 'query', 'sortBy': 'something'}  
-  this["valid_searchBy"] = ['keyword', 'description', 'packagename', 'author', 'contributors', 'dependencies']
-  this["valid_sortBy"] = ['relevance', 'issues', 'stars', 'githubstars']
+  this['validObj'] = {'searchBy': 'field', 'searchQuery': 'query', 'sortBy': 'something'}  
+  this['valid_searchBy'] = ['keyword', 'description', 'packagename', 'author', 'maintainers', 'dependencies', 'general']
+  this['valid_sortBy'] = ['relevance', 'issues', 'stars', 'githubstars']
 }
 
 Searchnpm.prototype.searchPackages = function (searchObj, callback){ 
@@ -45,17 +45,17 @@ Searchnpm.prototype.validateJson = function (searchObj){
         throw Error('You passed in an invalid JSON obj\n, it should look like{ searchBy: <argument>, search-querey: <argument>, sortBy: <argument> }')
     })
     //check if the keys contain properValues in them
-    if (this["valid_searchBy"].indexOf(searchObj["searchBy"]) === -1) // its not there
-      throw Error('The searchBy field must be one of the follwing' + this["valid_searchBy"]) 
-    if(this["valid_sortBy"].indexOf(searchObj["sortBy"]) === -1)
-      throw Error('The sortBy field must be one of the following' + this["valid_sortBy"]) 
+    if (this['valid_searchBy'].indexOf(searchObj['searchBy']) === -1) // its not there
+      throw Error('The searchBy field must be one of the follwing' + this['valid_searchBy']) 
+    if(this['valid_sortBy'].indexOf(searchObj['sortBy']) === -1)
+      throw Error('The sortBy field must be one of the following' + this['valid_sortBy']) 
     return searchObj  
   }else if(typeof searchObj === 'string'){ 
     //make a default JSON object to search by
     var tempObj = {} 
     Object.keys(this.validObj).forEach(function (key){ 
       if (key === 'searchBy') 
-        tempObj[key] = 'packagename'
+        tempObj[key] = 'general'
       if (key === 'searchQuery') 
         tempObj[key] = searchObj //searchObj was passed in as a string
       if (key === 'sortBy') 
@@ -70,38 +70,14 @@ Searchnpm.prototype.validateJson = function (searchObj){
 //parse through the searchObj 
 //take 
 Searchnpm.prototype.buildQueries = function (searchObj){ 
-  switch (searchObj["searchBy"]){
-    case 'keyword': 
-      //figure out what we're sorting by 
-      var sort = searchObj["sortBy"]
-      var queryObj = {}
-      queryObj.query = {
-        'match': { 
-          'keyword': searchObj["searchQuery"]             
-        } 
-      }
-      if (sort === 'relevance'){ // use natural ES sorting
-        return queryObj 
-      }else{ 
-        var sortBy = searchObj['sortBy']
-        queryObj.sort = []
-        var sortObj = {} 
-        sortObj[sortBy] = "desc" //TODO: include additional sort parameters  
-        queryObj.sort.push(sortObj) 
-        console.log(JSON.stringify(queryObj))
-        return JSON.stringify(queryObj)
-      }
-      break
-    case 'description': 
-    
-    case 'packagename':
-    
-    case 'author': 
-
-    case 'contributors': 
-
-    case 'dependencies': 
-
+  switch (searchObj['searchBy']){
+    case 'keyword': break
+    case 'description': break  
+    case 'packagename': break 
+    case 'author': break  
+    case 'maintainers': break
+    case 'dependencies': break
+    default: break 
   }
 }   
 
