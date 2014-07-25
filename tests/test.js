@@ -20,11 +20,11 @@ describe('The constuctor',function () {
     expect(search.esUrl).to.equal('http://localhost:9200/npm')
     done()
   })
-  it('should make a new elasticsearch instance', function(done){ 
+  /*it('should make a new elasticsearch instance', function(done){ 
     var search = new Searchnpm()
     expect(search.client).to.be.ok
     done() 
-  })
+  })*/
   it('should throw an error when it can\'t connect to ES', function(done){ 
     var dummy = child_process.spawn(process.execPath, [__filename, 'crashtestdummy'])
     dummy.on('close', function (code, signal) {
@@ -70,10 +70,16 @@ describe('JSON validator', function (){
       var searchString = 'express' 
       expect(search.validateJson(searchString)).to.be.an('object')
       //make sure it has the right fields
-      expect(search.validateJson(searchString)["search-by"]).to.be.ok
-      expect(search.validateJson(searchString)["search-query"]).to.be.ok
-      expect(search.validateJson(searchString)["sort-by"]).to.be.ok
+      expect(search.validateJson(searchString)["searchBy"]).to.be.ok
+      expect(search.validateJson(searchString)["searchQuery"]).to.be.ok
+      expect(search.validateJson(searchString)["sortBy"]).to.be.ok
       done() 
     })
+    it('shouldn\'t complain about not having a sort field', function (done) { 
+      var search = new Searchnpm()
+      var searchObj = {searchBy: 'keyword', searchQuery: 'yo'} 
+      expect(search.validateJson(searchObj)).to.be.ok
+    })
+ 
 })   
 

@@ -3,6 +3,7 @@
 //Function that builds queries based on what you pass in
 ' use strict '; 
 var elasticsearch = require('elasticsearch')
+  , QueryFactory = require('./lib/QueryFactory') 
 
 function Searchnpm (esUrl){ 
   if (esUrl) this.esUrl = esUrl
@@ -19,9 +20,10 @@ function Searchnpm (esUrl){
     if (error) throw Error('Elasticsearch is having trouble connecting the url you gave it') 
     else console.log('connected to ES')   
   })
-  this['validObj'] = {'searchBy': 'field', 'searchQuery': 'query', 'sortBy': 'something'}  
-  this['valid_searchBy'] = ['keyword', 'description', 'packagename', 'author', 'maintainers', 'dependencies', 'general']
-  this['valid_sortBy'] = ['relevance', 'issues', 'stars', 'githubstars']
+  this.allKeys = ['searchBy' , 'searchQuery', 'sortBy', 'page', 'sortOrd', 'from', 'size']
+  this.mandKeys = ['searchQuery']  
+  this.validSearchBy = ['keyword', 'description', 'packagename', 'author', 'maintainers', 'dependencies', 'general']
+  this.vaildSortBy = ['relevance', 'issues', 'stars', 'githubstars', 'downloads', 'date']
 }
 
 Searchnpm.prototype.searchPackages = function (searchObj, callback){ 
@@ -29,7 +31,6 @@ Searchnpm.prototype.searchPackages = function (searchObj, callback){
   var query = this.buildQueries(searchObj)
   this.client.search(query, function (err, results){ 
     if (err){ 
-      console.log(err) 
       callback(err, null)
       return
     }else {
@@ -40,27 +41,36 @@ Searchnpm.prototype.searchPackages = function (searchObj, callback){
 
 Searchnpm.prototype.validateJson = function (searchObj){
   if (typeof searchObj === 'object'){
-    Object.keys(this.validObj).forEach(function (key) {
-      if (!searchObj.hasOwnProperty(key)) 
-        throw Error('You passed in an invalid JSON obj\n, it should look like{ searchBy: <argument>, search-querey: <argument>, sortBy: <argument> }')
+    Object.keys(this.mandKeys).forEach(function (key) {
+      if(!searchObj.hasOwnProperty(key)) 
+        throw Error('You passed in an invalid JSON obj\n, it should look like{search-querey: <argument>}')
     })
-    //check if the keys contain properValues in them
-    if (this['valid_searchBy'].indexOf(searchObj['searchBy']) === -1) // its not there
-      throw Error('The searchBy field must be one of the follwing' + this['valid_searchBy']) 
-    if(this['valid_sortBy'].indexOf(searchObj['sortBy']) === -1)
-      throw Error('The sortBy field must be one of the following' + this['valid_sortBy']) 
+    //fill in minimum parameters  
+    searchObj.searchBy = searchObj.searchBy || 'general'
+    searchObj.sortBy = searchObj.sortBy || 'relevance'
+    searchObj.from = searchObj.from || 0
+    searchObj.size = searchObj.size || 10000000000 //big number probably will end up changing in future   
+    //check to see if their shit is okay 
+    
+    if (this.valid_searchBy.indexOf(searchObj.searchBy) === -1) // its not there
+      throw Error('The searchBy field must be one of the follwing' + this.validSearchBy) 
+    
+    if (this.valid_sortBy.indexOf(searchObj.sortBy) === -1)
+      throw Error('The sortBy field must be one of the following' + this.validSortBy)  
+ 
+    if (searchObj.sortOrd && (searchObj.sortOrd != 'asc' || searchObj.sortOrd != 'desc'))
+      throw Error('You can only sort by ascending or descending order, respectively corresponding to asc and desc')
+
     return searchObj  
   }else if(typeof searchObj === 'string'){ 
-    //make a default JSON object to search by
+    //make a default JSON object to search by most likely going to be used by the cli 
+    //this will make a default obj with from being 0 and size 
     var tempObj = {} 
-    Object.keys(this.validObj).forEach(function (key){ 
-      if (key === 'searchBy') 
-        tempObj[key] = 'general'
-      if (key === 'searchQuery') 
-        tempObj[key] = searchObj //searchObj was passed in as a string
-      if (key === 'sortBy') 
-        tempObj[key] = 'relevance' 
-    })
+    tempObj.searchBy = 'general'
+    tempObj.sortBy = 'relevance'
+    tempObj.from =  0
+    tempObj.size = 10000000000 //big number probably will end up changing in future   
+       
     return tempObj
   }else
     throw Error('You must either pass in a string or an object to make a query') 
@@ -71,13 +81,13 @@ Searchnpm.prototype.validateJson = function (searchObj){
 //take 
 Searchnpm.prototype.buildQueries = function (searchObj){ 
   switch (searchObj['searchBy']){
-    case 'keyword': break
-    case 'description': break  
-    case 'packagename': break 
-    case 'author': break  
-    case 'maintainers': break
-    case 'dependencies': break
-    default: break 
+    case 'keyword': QueryFactory.searchKeyword(searchObj) break
+    case 'description': QueryFactory.searchDescription(searchObj) break  
+    case 'packagename': QueryFactory.searchName(searchObj)  break 
+    case 'author': QueryFactory.searchAuthor(searchObj) break  
+    case 'maintainers': QueryFactory.searchMaintainers(searchObj) break
+    case 'dependencies': QueryFactory.searchDependencies(searchObj) break
+    default: QueryFactory.searchDefault(searchObj) break 
   }
 }   
 
