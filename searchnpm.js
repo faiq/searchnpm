@@ -8,7 +8,7 @@ var elasticsearch = require('elasticsearch')
 function Searchnpm (esUrl){ 
   if (esUrl) this.esUrl = esUrl
   else if(process.env.NODE_ENV === 'development') this.esUrl = 'http://localhost:9200/npm'
-  else this.esUrl = 'http://localhost:9200/npm' //production ElasticSearch url will change when in actual production production will be default 
+  else this.esUrl = 'http://www-3.aws-east.internal.npmjs.com:9200/npm' //production ElasticSearch url will change when in actual production production will be default 
   var _this = this 
   this.client = new elasticsearch.Client({ 
     host: _this.esUrl
@@ -29,14 +29,16 @@ function Searchnpm (esUrl){
 Searchnpm.prototype.searchPackages = function (searchObj, callback){ 
   searchObj = this.validateJson(searchObj)
   var query = this.buildQueries(searchObj)
-  this.client.search(query, function (err, results){ 
-    if (err){ 
-      callback(err, null)
-      return
-    }else {
-      callback(null, results)
-    } 
-  })
+  if (query){  
+    this.client.search(query, function (err, results){ 
+      if (err){ 
+        callback(err, null)
+        return
+      }else {
+        callback(null, results)
+      } 
+    })
+  }
 }
 
 Searchnpm.prototype.validateJson = function (searchObj){
@@ -49,7 +51,7 @@ Searchnpm.prototype.validateJson = function (searchObj){
     searchObj.searchBy = searchObj.searchBy || 'general'
     searchObj.sortBy = searchObj.sortBy || 'relevance'
     searchObj.from = searchObj.from || 0
-    searchObj.size = searchObj.size || 10000000000 //big number probably will end up changing in future   
+    searchObj.size = searchObj.size || 1000   //big number probably will end up changing in future   
     //check to see if their shit is okay 
     
     if (this.valid_searchBy.indexOf(searchObj.searchBy) === -1) // its not there
@@ -69,7 +71,7 @@ Searchnpm.prototype.validateJson = function (searchObj){
     tempObj.searchBy = 'general'
     tempObj.sortBy = 'relevance'
     tempObj.from =  0
-    tempObj.size = 10000000000 //big number probably will end up changing in future   
+    tempObj.size = 1000   //big number probably will end up changing in future   
        
     return tempObj
   }else
@@ -81,13 +83,27 @@ Searchnpm.prototype.validateJson = function (searchObj){
 //take 
 Searchnpm.prototype.buildQueries = function (searchObj){ 
   switch (searchObj['searchBy']){
-    case 'keyword': QueryFactory.searchKeyword(searchObj) break
-    case 'description': QueryFactory.searchDescription(searchObj) break  
-    case 'packagename': QueryFactory.searchName(searchObj)  break 
-    case 'author': QueryFactory.searchAuthor(searchObj) break  
-    case 'maintainers': QueryFactory.searchMaintainers(searchObj) break
-    case 'dependencies': QueryFactory.searchDependencies(searchObj) break
-    default: QueryFactory.searchDefault(searchObj) break 
+    case 'keyword': 
+      return QueryFactory.searchKeyword(searchObj) 
+      break
+    case 'description': 
+      return QueryFactory.searchDescription(searchObj) 
+      break  
+    case 'packagename': 
+      return QueryFactory.searchName(searchObj)  
+      break 
+    case 'author': 
+      return QueryFactory.searchAuthor(searchObj) 
+      break  
+    case 'maintainers': 
+      return QueryFactory.searchMaintainers(searchObj)
+      break
+    case 'dependencies': 
+      return QueryFactory.searchDependencies(searchObj) 
+      break
+    default:
+      return QueryFactory.searchDefault(searchObj) 
+      break 
   }
 }   
 
