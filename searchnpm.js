@@ -7,15 +7,13 @@ var elasticsearch = require('elasticsearch')
 
 function Searchnpm (esUrl){ 
   if (esUrl) this.esUrl = esUrl
-  else if(process.env.env === 'development') this.esUrl = 'http://localhost:9200/npm'
-  else this.esUrl = 'http://www-3.aws-east.internal.npmjs.com:9200/npm' //production ElasticSearch url will change when in actual production production will be default 
+  else this.esUrl = 'http://localhost:9200/npm'
   var _this = this 
   this.client = new elasticsearch.Client({ 
     host: _this.esUrl
   })
   this.ready = false
   var _this = this 
-  console.log(this.esUrl) 
   this.client.ping({ 
     requestTimeout: 1000, 
     hello: 'elasticsearch!'
@@ -37,7 +35,6 @@ Searchnpm.prototype.searchPackages = function (searchObj, callback){
   var _this = this
   searchObj = this.validateJson(searchObj)
   var query = this.buildQueries(searchObj)
-  console.log(this.ready)
   if (this.ready){  
     this.client.search(query, function (err, results){ 
       if (err){ 
@@ -87,7 +84,6 @@ Searchnpm.prototype.validateJson = function (searchObj){
       throw Error('The sortBy field must be one of the following' + this.validSortBy)  
     
     searchObj.sortOrd= searchObj.sortOrd || 'desc' 
-    console.log(searchObj.sortOrd) 
     
     if (searchObj.sortOrd && !(searchObj.sortOrd === 'asc' ||  searchObj.sortOrd === 'desc'))
       throw Error('You can only sort by ascending or descending order, respectively corresponding to asc and desc')
