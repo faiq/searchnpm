@@ -10,16 +10,16 @@ var server = restify.createServer({
 });
 
 server.use(restify.queryParser());
+server.use(restify.bodyParser()); 
 
-server.get('/', function(req, res, cb) {
+server.post('/', function(req, res, cb) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "X-Requested-With");
-  console.log(req.params) 
-  searchClient.searchPackages(req.params, function(err,results){ 
+  searchClient.searchPackages(req.body, function(err,results){ 
     if (err) return next(err);
     res.send(results) 
   }) 
 }) 
 
 
-server.listen(8080);
+server.listen(4001);

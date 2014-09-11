@@ -24,9 +24,9 @@ function Searchnpm (esUrl){
       _this.ready = true
     } 
   })
-  this.allKeys = ['searchBy' , 'searchQuery', 'sortBy', 'page', 'sortOrd', 'from', 'size']
+  this.allKeys = ['searchBy' , 'searchQuery', 'sortBy', 'page', 'sortOrd', 'from', 'size', 'ecosystem']
   this.mandKeys = ['searchQuery']  
-  this.validSearchBy = ['keyword', 'description', 'packagename', 'author', 'maintainers', 'dependencies', 'general']
+  this.validSearchBy = ['keyword', 'description', 'packagename', 'author', 'maintainers', 'dependencies', 'general', 'ecosystem']
   this.vaildSortBy = ['relevance', 'issues', 'stars', 'githubstars', 'downloads', 'date']
   this.retryCounter = 0
 }
@@ -38,6 +38,7 @@ Searchnpm.prototype.searchPackages = function (searchObj, callback){
   if (this.ready){  
     this.client.search(query, function (err, results){ 
       if (err){ 
+        console.log('getting err here ' + err)
         callback(err, null)
         return
       }else {
@@ -116,6 +117,8 @@ Searchnpm.prototype.buildQueries = function (searchObj){
     case 'dependencies': 
       return QueryFactory.searchDependencies(searchObj) 
       break
+    case 'ecosystem': 
+      return QueryFactory.searchDependencies(searchObj)
     default:
       return QueryFactory.searchDefault(searchObj) 
       break 
