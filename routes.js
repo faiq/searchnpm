@@ -12,7 +12,7 @@ var server = restify.createServer({
 server.use(restify.queryParser());
 server.use(restify.bodyParser()); 
 
-server.post('/', function(req, res, cb) {
+server.post('/search', function(req, res, cb) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "X-Requested-With");
   searchClient.searchPackages(req.body, function(err,results){ 
@@ -22,4 +22,4 @@ server.post('/', function(req, res, cb) {
 }) 
 
 
-server.listen(4001);
+server.listen(4000);

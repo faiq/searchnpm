@@ -24,7 +24,7 @@ function Searchnpm (esUrl){
       _this.ready = true
     } 
   })
-  this.allKeys = ['searchBy' , 'searchQuery', 'sortBy', 'page', 'sortOrd', 'from', 'size', 'ecosystem']
+  this.allKeys = ['searchBy' , 'searchQuery', 'sortBy', 'page', 'sortOrd', 'from', 'size','ecosystem']
   this.mandKeys = ['searchQuery']  
   this.validSearchBy = ['keyword', 'description', 'packagename', 'author', 'maintainers', 'dependencies', 'general', 'ecosystem']
   this.vaildSortBy = ['relevance', 'issues', 'stars', 'githubstars', 'downloads', 'date']
@@ -78,6 +78,8 @@ Searchnpm.prototype.validateJson = function (searchObj){
     searchObj.from = searchObj.from || 0
     searchObj.size = searchObj.size || 100   //big number probably will end up changing in future   
    
+    if (searchObj.searchBy === 'ecosystem' && !searchObj.ecosystem)  throw Error('You can\'t search by ecosystem, and not specify the ecosystem!')
+
     if ((this.validSearchBy).indexOf(searchObj.searchBy) === -1) // its not there
       throw Error('The searchBy field must be one of the follwing' + this.validSearchBy) 
     
@@ -118,7 +120,7 @@ Searchnpm.prototype.buildQueries = function (searchObj){
       return QueryFactory.searchDependencies(searchObj) 
       break
     case 'ecosystem': 
-      return QueryFactory.searchDependencies(searchObj)
+      return QueryFactory.searchEcosystem(searchObj)
     default:
       return QueryFactory.searchDefault(searchObj) 
       break 
