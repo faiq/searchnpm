@@ -103,27 +103,20 @@ Searchnpm.prototype.buildQueries = function (searchObj){
   switch (searchObj['searchBy']){
     case 'keyword': 
       return QueryFactory.searchKeyword(searchObj) 
-      break
     case 'description': 
       return QueryFactory.searchDescription(searchObj) 
-      break  
     case 'packagename': 
       return QueryFactory.searchPackageName(searchObj)  
-      break 
     case 'author': 
       return QueryFactory.searchAuthor(searchObj) 
-      break  
     case 'maintainers': 
       return QueryFactory.searchMaintainers(searchObj)
-      break
     case 'dependencies': 
       return QueryFactory.searchDependencies(searchObj) 
-      break
     case 'ecosystem': 
       return QueryFactory.searchEcosystem(searchObj)
     default:
       return QueryFactory.searchDefault(searchObj) 
-      break 
   }
 }   
 

@@ -15,7 +15,10 @@ server.use(restify.bodyParser());
 server.post('/search', function(req, res, cb) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "X-Requested-With");
-  searchClient.searchPackages(req.body, function(err,results){ 
+  console.log(req.body)  
+  console.log(req.params) 
+
+  searchClient.searchPackages(req.params, function(err,results){ 
     if (err) return next(err);
     res.send(results) 
   }) 
