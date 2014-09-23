@@ -37,7 +37,6 @@ Current supported ```searchBy``` fields are
  **general** - a general search that will consider the search query in the following fields: keywords, package description, readme, and package name. 
 	
  NOTE: The ranking in the general search will default to giving packages with a higher download frequency, star count, test scripts, and more dependancies a higher weight  compared to packages that don't. 
- 
  **ecosystem** - ```searchBy``` ecosystem is a field that will allow a person to search for a certain package based on what "ecosystem" its in. The way that "ecosystems" are currently implemented is through a elasticsearch "bool" search that has a "must" clause with keywords for the ecosystem. So, for example, if someone makes the following query: 
  ```
   {
@@ -67,11 +66,13 @@ Translates into something along the lines of the following in elasticsearch
     }
 ```	
 
-NOTE: The ranking for any search other than general will default to elasticsearch's default ranking algorithims, unless specified by the ```sortBy``` field
 
 <h5>```sortBy```</h5>- This field specifies how you want to order your search results. 
 
 Current supported ```sortBy``` fields are 
+
+NOTE: The ranking for any search other than general will default to elasticsearch's default ranking algorithims, unless specified by the ```sortBy``` field
+
 
  **relevance** - This is the default elasticsearch ranking ordering. You can read more about it at <a>http://www.elasticsearch.org/guide/en/elasticsearch/guide/current/relevance-intro.html</a>  
 
